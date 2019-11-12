@@ -1,0 +1,148 @@
+-- Table: public.articles
+
+-- DROP TABLE public.articles;
+
+CREATE TABLE public.articles
+(
+    "articleId" integer NOT NULL GENERATED ALWAYS AS IDENTITY ( CYCLE INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
+    title text COLLATE pg_catalog."default" NOT NULL,
+    article text COLLATE pg_catalog."default" NOT NULL,
+    employeeid integer NOT NULL,
+    createdon date NOT NULL,
+    CONSTRAINT articles_pkey PRIMARY KEY ("articleId"),
+    CONSTRAINT "articles_employeeId_fkey" FOREIGN KEY (employeeid)
+        REFERENCES public.employees (id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT
+        NOT VALID
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE public.articles
+    OWNER to young;
+
+
+
+-- Table: public.comments
+
+-- DROP TABLE public.comments;
+
+CREATE TABLE public.comments
+(
+    "commentId" integer NOT NULL,
+    comments text COLLATE pg_catalog."default" NOT NULL,
+    "articleId" integer NOT NULL,
+    "gifId" integer NOT NULL GENERATED ALWAYS AS IDENTITY ( CYCLE INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
+    "authorId" integer NOT NULL,
+    "createdOn" timestamp with time zone NOT NULL,
+    CONSTRAINT "commentId" PRIMARY KEY ("commentId"),
+    CONSTRAINT "articleId" FOREIGN KEY ("articleId")
+        REFERENCES public.articles ("articleId") MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT
+        NOT VALID,
+    CONSTRAINT "authorId" FOREIGN KEY ("authorId")
+        REFERENCES public.employees (id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT
+        NOT VALID,
+    CONSTRAINT "gifId" FOREIGN KEY ("gifId")
+        REFERENCES public.gifs ("gifId") MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT
+        NOT VALID
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE public.comments
+    OWNER to young;
+
+
+-- Table: public.employees
+
+-- DROP TABLE public.employees;
+
+CREATE TABLE public.employees
+(
+    address text COLLATE pg_catalog."default" NOT NULL,
+    department text COLLATE pg_catalog."default" NOT NULL,
+    email text COLLATE pg_catalog."default" NOT NULL,
+    firstname text COLLATE pg_catalog."default" NOT NULL,
+    gender text COLLATE pg_catalog."default" NOT NULL,
+    id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( CYCLE INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
+    jobrole text COLLATE pg_catalog."default" NOT NULL,
+    lastname text COLLATE pg_catalog."default" NOT NULL,
+    password text COLLATE pg_catalog."default" NOT NULL,
+    role text COLLATE pg_catalog."default" NOT NULL,
+    CONSTRAINT employees_pkey PRIMARY KEY (id),
+    CONSTRAINT "employeeId" UNIQUE (id)
+
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE public.employees
+    OWNER to young;
+
+
+
+-- Table: public.gifs
+
+-- DROP TABLE public.gifs;
+
+CREATE TABLE public.gifs
+(
+    "gifId" integer NOT NULL GENERATED ALWAYS AS IDENTITY ( CYCLE INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
+    title text COLLATE pg_catalog."default" NOT NULL,
+    "imageUrl" text COLLATE pg_catalog."default" NOT NULL,
+    "employeeId" integer NOT NULL,
+    "createdOn" timestamp with time zone NOT NULL,
+    CONSTRAINT "gifId" PRIMARY KEY ("gifId"),
+    CONSTRAINT "employeeId" FOREIGN KEY ("employeeId")
+        REFERENCES public.employees (id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT
+        NOT VALID
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE public.gifs
+    OWNER to young;
+
+
+
+    
+select * from article_comments join articles on article_comments.article_id = articles.article_id;
+
+
+
+select 
+  article_comments.article_comment_id, 
+  article_comments.comments, 
+  article_comments.article_id,
+  article_comments.created_on, 
+  articles.article,
+  articles.title
+from article_comments, articles;
+
+
+SELECT 
+    article_comments.article_comment_id, 
+    article_comments.comments, 
+    article_comments.author_id, 
+    article_comments.article_id,
+    article_comments.created_on,
+    articles.title,
+    articles.article
+FROM article_comments JOIN articles on article_comments.article_id = articles.article_id
